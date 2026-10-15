@@ -1,11 +1,9 @@
 #/bin/sh
-CURRENT_PATH=`pwd`
-HTSLIB_PATH=${CURRENT_PATH}/vendor/htslib-1.11
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${HTSLIB_PATH}
+HTSLIB_PATH=$(pwd)/vendor/htslib-1.24
 
 export LD_LIBRARY_PATH
 LD_LIBRARY_PATH=${HTSLIB_PATH}
-cd vendor/htslib-1.11
+cd ${HTSLIB_PATH}
 autoheader
 autoconf
 ./configure
@@ -14,7 +12,5 @@ cd cpp
 echo "==============================================================="
 
 make
-cd -
-cp -rf cpp/msisensor-pro ./binary/
-
-
+mkdir -p ../binary
+mv msisensor-pro ../binary/
