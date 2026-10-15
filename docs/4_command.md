@@ -40,6 +40,7 @@ scan the reference genome to get microsatellites information
        -x   <int>      output homopolymer only, 0: no; 1: yes, [default=0]
        -y   <int>      output microsatellites only, 0: no; 1: yes, [default=0]
        -0   <int>      output site have no read coverage, 1: no; 0: yes, [default=1]
+       -D, --ignore-duplicates   ignore reads marked as duplicate, [default=no]
        -h   help
 
 
@@ -64,6 +65,7 @@ scan the reference genome to get microsatellites information
        -x   <int>      output homopolymer only, 0: no; 1: yes, [default=0]
        -y   <int>      output microsatellite only, 0: no; 1: yes, [default=0[
        -0   <int>      output site have no read coverage, 1: no; 0: yes, [default=1]
+       -D, --ignore-duplicates   ignore reads marked as duplicate, [default=no]
        -h   help
 
 ## _baseline_
