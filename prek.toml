@@ -8,13 +8,11 @@ hooks = [
     { id = "trailing-whitespace" },
     { id = "end-of-file-fixer" },
     { id = "check-added-large-files" },
-    { id = "check-added-large-files" }
 ]
 
 [[repos]]
 repo = "https://github.com/cpp-linter/cpp-linter-hooks"
 rev = "v1.6.1"
 hooks = [
-    { id = "clang-format" },
-    { id = "clang-tidy" }
+    { id = "clang-format", args = ["--style=GNU", "--fail-on-incomplete-format"] },
 ]

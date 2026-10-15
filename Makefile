@@ -38,7 +38,7 @@ endif
 # Version extraction
 VERSION ?=
 ifeq ($(VERSION),)
-    BASE_VERSION := $(strip $(shell cat $(MAKEFILE_DIR)/VERSION 2>/dev/null || echo "1.4.0"))
+    BASE_VERSION := $(strip $(shell cat $(MAKEFILE_DIR)/VERSION 2>/dev/null || echo "dev"))
     GIT_TAG := $(shell git describe --tags --exact-match 2>/dev/null)
     GIT_DESC := $(shell git describe --always --dirty 2>/dev/null)
     ifneq ($(GIT_TAG),)
