@@ -14,12 +14,7 @@
 
 //using namespace std;
 
-#ifdef __cplusplus
-extern "C" {
 std::string abs_path(std::string path);
-
-}
-#endif
 
 #endif //_DISTRIBUTION_H_
 

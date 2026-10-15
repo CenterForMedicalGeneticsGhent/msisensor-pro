@@ -543,8 +543,10 @@ int tGetOptions(int rgc, char *rgv[]) {
 std::string abs_path(std::string path) {
 #define max_path 40960
     char resolved_path[max_path] = {0};
-    realpath(path.c_str(), resolved_path);
-    return std::string(resolved_path);
+    if (realpath(path.c_str(), resolved_path) != NULL) {
+        return std::string(resolved_path);
+    }
+    return path;
 }
 
 int trainTest() {

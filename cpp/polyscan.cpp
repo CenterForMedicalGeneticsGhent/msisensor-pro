@@ -306,7 +306,7 @@ bool PolyScan::LoadHomosAndMicrosates(std::ifstream &fin) {
             if ((loc + siteLength * siteRepeats) < tbedRegion.start)
                 continue;
             if (loc > tbedRegion.end) {
-                for (j; j < tbedChr.regions_list.size(); j++) {
+                for (; j < tbedChr.regions_list.size(); j++) {
                     tbedRegion = tbedChr.regions_list[j];
                     if (loc <= tbedRegion.end) {
                         break;
@@ -675,7 +675,6 @@ void PolyScan::MergeBaseline(Sample &oneSample,
     std::unordered_map <std::string, std::vector<double>> FinalSites;
     std::unordered_map < std::string, std::vector < double >> ::iterator
     iter;
-     paramd.sampleNum; // 2 is parameter
     std::cout << "Microsatellites supported by less than " <<paramd.sampleNum<< " samples will be filtered. " << std::endl;
 
     std::vector<double> buf;
