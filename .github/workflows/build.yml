@@ -1,5 +1,8 @@
 name: Build CI
-on: [push, pull_request]
+on:
+  pull_request:
+  release:
+    types: [published]
 
 jobs:
   build-ubuntu:
@@ -10,8 +13,10 @@ jobs:
         include:
           # x86-64
           - os: ubuntu-latest
+            arch: x86_64
           # arm
           - os: ubuntu-24.04-arm
+            arch: aarch64
 
     steps:
     - name: Checkout
@@ -40,6 +45,21 @@ jobs:
       run: |
         make check
 
+    - name: Prepare binary artifact
+      if: github.event_name == 'release'
+      run: |
+        mkdir -p bin-out
+        chmod +x msisensor-pro
+        cp msisensor-pro bin-out/msisensor-pro-linux-${{ matrix.arch }}
+        tar -czf bin-out/msisensor-pro-linux-${{ matrix.arch }}.tar.gz msisensor-pro
+
+    - name: Upload binary artifact
+      if: github.event_name == 'release'
+      uses: actions/upload-artifact@v4
+      with:
+        name: binary-${{ matrix.arch }}
+        path: bin-out/*
+
   build-docker:
     needs: build-ubuntu
     if: >
@@ -47,7 +67,7 @@ jobs:
       (github.event_name == 'push' && github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
       - uses: actions/checkout@v7
@@ -84,3 +104,39 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Download compiled binaries
+        if: github.event_name == 'release'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: binary-*
+          path: downloaded-binaries
+          merge-multiple: true
+
+      - name: Save Docker image archives for release
+        if: github.event_name == 'release'
+        run: |
+          version="${{ github.event.release.tag_name }}"
+          version="${version#v}"
+          image="ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')"
+
+          # Pull and save amd64 image
+          docker pull "${image}:${version}" --platform linux/amd64
+          docker save "${image}:${version}" | gzip > msisensor-pro-docker-amd64.tar.gz
+
+          # Pull and save arm64 image
+          docker pull "${image}:${version}" --platform linux/arm64
+          docker save "${image}:${version}" | gzip > msisensor-pro-docker-arm64.tar.gz
+
+      - name: Attach binaries and Docker image to release
+        if: github.event_name == 'release'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p release-assets
+          cp downloaded-binaries/msisensor-pro-linux-* release-assets/
+          cp msisensor-pro-docker-*.tar.gz release-assets/
+          cd release-assets
+          sha256sum msisensor-pro-* > SHA256SUMS.txt
+          cd ..
+          gh release upload "${{ github.event.release.tag_name }}" release-assets/* --clobber
