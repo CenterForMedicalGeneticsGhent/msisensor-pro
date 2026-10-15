@@ -1,34 +1,40 @@
-CXX=g++
+CXX ?= g++
 
-HTSLIB=$(realpath ../vendor/htslib-1.11)
-# HTSLIB_CPPFLAGS=-I$(realpath $(HTSLIB_ROOT))
-# echo $(HTSLIB_CPPFLAGS)
-# HTSLIB_LDFLAGS=-L/mnt/project/Project_Pindel/pindel_update/pindel/htslib/ -Wl,-rpath
-CPP_ROOT=cpp
-CXXFLAGS+=    -O2 -fopenmp
-LDFLAGS+=    -L${HTSLIB}
-INCLUDES+=    -I${HTSLIB}
-LIBS+=    -lm -lz -lpthread -lhts
-LD_LIBRARY_PATH+= -L${HTSLIB}
-export LD_LIBRARY_PATH=${HTSLIB_ROOT}
+MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+HTSLIB := $(abspath $(MAKEFILE_DIR)/../vendor/htslib-1.24)
+HTSLIB_LIB := $(HTSLIB)/libhts.a
+
+# Static HTSlib so msisensor-pro does not need vendor libhts at runtime.
+-include $(HTSLIB)/htslib_static.mk
+
+CXXFLAGS += -std=c++11 -O2 -fopenmp -pthread
+INCLUDES += -I$(HTSLIB)
+LIBS += -pthread $(HTSLIB_static_LIBS)
+LDFLAGS += $(HTSLIB_static_LDFLAGS)
 
 SOURCE = cmds scan distribution refseq polyscan param utilities homo window bamreader sample chi somatic
-OBJS= $(patsubst %,%.o,$(SOURCE))
+OBJS = $(patsubst %,%.o,$(SOURCE))
+DEPS = $(OBJS:.o=.d)
 
-%.o:%.cpp
-	        $(CXX) -L ${HTSLIB} -std=c++11 $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+.PHONY: all htslib clean distclean
 
-all: htsfile msisensor-pro
-#
-htsfile:
-	        $(MAKE) -C ${HTSLIB}
+all: msisensor-pro
 
-msisensor-pro: $(OBJS)
-	        $(CXX)  -std=c++11 $^ $(CXXFLAGS) $(LDFLAGS)  $(LIBS) -Wl,-rpath=${HTSLIB} -o $@
-		# 	        $(CXX)  -std=c++11 $^ $(CXXFLAGS) $(INCLUDES)  $(LDFLAGS) $(LIBS) -o $@
+htslib: $(HTSLIB_LIB)
+
+$(HTSLIB_LIB):
+	$(MAKE) -C $(HTSLIB) lib-static
+
+%.o: %.cpp | $(HTSLIB_LIB)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
+
+msisensor-pro: $(OBJS) $(HTSLIB_LIB)
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LIBS) -o $@
 
 clean:
-	        rm -f *.o msisensor-pro
-			        $(MAKE) -C ${HTSLIB}  clean
+	rm -f $(OBJS) $(DEPS) msisensor-pro
 
+distclean: clean
+	$(MAKE) -C $(HTSLIB) clean
 
+-include $(DEPS)
