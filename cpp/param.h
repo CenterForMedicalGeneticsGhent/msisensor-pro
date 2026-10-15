@@ -80,6 +80,7 @@ public:
   bool train;
   bool pro;
   bool hard;
+  bool filterDuplicates;
 };
 
 #endif //_PARAM_H_

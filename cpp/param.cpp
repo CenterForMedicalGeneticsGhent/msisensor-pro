@@ -79,7 +79,8 @@ Param::Param ()
       hunterThreshold (0.1),   // YeLab
       outputzeroDis (1),       // Yelab
       NormalcovCutoff (0.5),   // Yelab
-      train (false), pro (false), hard (false), sampleNum (10)
+      train (false), pro (false), hard (false), sampleNum (10),
+      filterDuplicates (false)
 //        sampleNum(10)
 {
   inital_homo_phabet ();
