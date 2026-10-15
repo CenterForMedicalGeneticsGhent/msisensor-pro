@@ -35,10 +35,25 @@ else
     OPENMP_LDFLAGS ?= -fopenmp
 endif
 
+# Version extraction
+VERSION ?=
+ifeq ($(VERSION),)
+    BASE_VERSION := $(strip $(shell cat $(MAKEFILE_DIR)/VERSION 2>/dev/null || echo "1.4.0"))
+    GIT_TAG := $(shell git describe --tags --exact-match 2>/dev/null)
+    GIT_DESC := $(shell git describe --always --dirty 2>/dev/null)
+    ifneq ($(GIT_TAG),)
+        VERSION := $(GIT_TAG)
+    else ifneq ($(GIT_DESC),)
+        VERSION := $(BASE_VERSION)-$(GIT_DESC)
+    else
+        VERSION := $(BASE_VERSION)
+    endif
+endif
+
 # Include HTSlib static flags if available
 -include $(HTSLIB)/htslib_static.mk
 
-CPPFLAGS += -I$(HTSLIB) $(OPENMP_CXXFLAGS)
+CPPFLAGS += -I$(HTSLIB) $(OPENMP_CXXFLAGS) -DVERSION=\"$(VERSION)\"
 LDFLAGS += $(OPENMP_LDFLAGS) $(HTSLIB_static_LDFLAGS)
 LIBS += -pthread $(HTSLIB_static_LIBS)
 ifeq ($(HTSLIB_static_LIBS),)
