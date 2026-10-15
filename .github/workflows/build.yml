@@ -15,10 +15,9 @@ jobs:
 
     steps:
     - name: Checkout
-      # This is actions/checkout@v6.0.2
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      uses: actions/checkout@v7
       with:
-        submodules: true
+        submodules: recursive
 
     # Linux (ubuntu-latest) build
     - name: Run apt
