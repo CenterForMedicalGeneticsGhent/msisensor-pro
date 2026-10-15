@@ -47,11 +47,11 @@ Dependent packages including zlib, ncurses and nurses-dev are required for MSIse
 * make
 
       cd msisensor-pro/
-      ./INSTALL
+      make
 
 * install
 
-      sudo mv binary/msisensor-pro /usr/local/bin/
+      sudo make install
 
   You can also choose to add the path of msisensor-pro to the PATH variable or run it directly using the absolute path.
 
