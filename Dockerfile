@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY Makefile /app/
+COPY Makefile VERSION /app/
 COPY vendor /app/vendor/
 COPY cpp /app/cpp/
 RUN make
