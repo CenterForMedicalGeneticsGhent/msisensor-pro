@@ -68,10 +68,6 @@ DEPS := $(SOURCE:.cpp=.d)
 
 all: $(TARGET)
 
-binary: $(TARGET)
-	@mkdir -p binary
-	cp -f $(TARGET) binary/$(TARGET)
-
 htslib: $(HTSLIB_LIB)
 
 $(HTSLIB)/configure:
