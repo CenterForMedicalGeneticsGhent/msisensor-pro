@@ -170,6 +170,8 @@ DisUsage (void)
       << "       -0   <int>      output site have no read coverage, 1: no; 0: "
          "yes, [default="
       << paramd.outputzeroDis << "]\n"
+      << "       -D, --ignore-duplicates   ignore reads marked as duplicate, "
+         "[default=no]\n"
       << "       -h   help\n"
       << "-----------------------------------------------------------------\n"
       << "Function: \n"
@@ -263,6 +265,8 @@ ProUsage (void)
       << "       -0   <int>      output site have no read coverage, 1: no; 0: "
          "yes, [default="
       << paramd.outputzeroDis << "]\n"
+      << "       -D, --ignore-duplicates   ignore reads marked as duplicate, "
+         "[default=no]\n"
       << "       -h   help\n"
       << "-----------------------------------------------------------------\n"
       << "Function: \n"
@@ -498,7 +502,25 @@ dGetOptions (int rgc, char *rgv[])
         case '0':
           paramd.outputzeroDis = atoi (rgv[++i]);
           break;
-
+        case 'D':
+          paramd.filterDuplicates = true;
+          break;
+        case '-':
+          if (strcmp (rgv[i], "--ignore-duplicates") == 0)
+            {
+              paramd.filterDuplicates = true;
+              break;
+            }
+          else if (strcmp (rgv[i], "--help") == 0)
+            {
+              DisUsage ();
+            }
+          else
+            {
+              std::cout << "ERROR: unrecognized option " << rgv[i]
+                        << std::endl;
+              exit (1);
+            }
           break;
         case 'h':
           DisUsage ();
@@ -579,6 +601,25 @@ dGetProOptions (int rgc, char *rgv[])
         case '0':
           paramd.outputzeroDis = atoi (rgv[++i]);
           break;
+        case 'D':
+          paramd.filterDuplicates = true;
+          break;
+        case '-':
+          if (strcmp (rgv[i], "--ignore-duplicates") == 0)
+            {
+              paramd.filterDuplicates = true;
+              break;
+            }
+          else if (strcmp (rgv[i], "--help") == 0)
+            {
+              ProUsage ();
+            }
+          else
+            {
+              std::cout << "ERROR: unrecognized option " << rgv[i]
+                        << std::endl;
+              exit (1);
+            }
           break;
         case 'h':
           ProUsage ();

@@ -16,6 +16,8 @@
 #include "bamreader.h"
 #include "distribution.h"
 
+extern Param paramd;
+
 // Static function declaration
 static int fetch_func_SR (const bam1_t *b1, void *data);
 
@@ -187,6 +189,11 @@ parse_flags_and_tags (const bam1_t *b, flags_hit *flags)
 static int
 fetch_func_ALL (const bam1_t *b1, void *data)
 {
+  if (paramd.filterDuplicates && (b1->core.flag & BAM_FDUP))
+    {
+      return 0;
+    }
+
   fetch_func_data_SR *data_for_bam = (fetch_func_data_SR *)data;
   khash_t (read_name) *read_to_map_qual
       = (khash_t (read_name) *)data_for_bam->read_to_map_qual;
